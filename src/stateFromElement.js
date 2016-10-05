@@ -8,7 +8,7 @@ import {
   Entity,
   genKey,
 } from 'draft-js';
-import {List, OrderedSet, Repeat, Seq} from 'immutable';
+import {fromJS, List, Map, OrderedSet, Repeat, Seq} from 'immutable';
 import {BLOCK_TYPE, ENTITY_TYPE, INLINE_STYLE} from 'draft-js-utils';
 import {NODE_TYPE_ELEMENT, NODE_TYPE_TEXT} from 'synthetic-dom';
 
@@ -48,6 +48,7 @@ type ElementStyles = {[tagName: string]: Style};
 
 type Options = {
   elementStyles?: ElementStyles;
+  filterBlockData?: false;
 };
 
 const NO_STYLE = OrderedSet();
@@ -177,14 +178,18 @@ class BlockGenerator {
       text = text.split(SOFT_BREAK_PLACEHOLDER).join('\n');
       // Discard empty blocks (unless otherwise specified).
       if (text.length || includeEmptyBlock) {
+        let blockData = {
+          key: genKey(),
+          text: text,
+          type: block.type,
+          characterList: characterMeta.toList(),
+          depth: block.depth,
+        };
+        if (block.hasOwnProperty('data') && Map.isMap(block.data)) {
+          blockData.data = block.data;
+        }
         contentBlocks.push(
-          new ContentBlock({
-            key: genKey(),
-            text: text,
-            type: block.type,
-            characterList: characterMeta.toList(),
-            depth: block.depth,
-          })
+          new ContentBlock(blockData)
         );
       }
     });
@@ -253,6 +258,9 @@ class BlockGenerator {
       depth: hasDepth ? this.depth : 0,
     };
     if (allowRender) {
+      if (this.options && this.options.hasOwnProperty('filterBlockData') && this.options.filterBlockData) {
+        block.data = fromJS(this.options.filterBlockData({}, element, block));
+      }
       this.blockList.push(block);
       if (hasDepth) {
         this.depth += 1;
