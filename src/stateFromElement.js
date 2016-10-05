@@ -259,7 +259,7 @@ class BlockGenerator {
     };
     if (allowRender) {
       if (this.options && this.options.hasOwnProperty('filterBlockData') && this.options.filterBlockData) {
-        block.data = fromJS(this.options.filterBlockData({}, element, block));
+        block.data = fromJS(this.options.filterBlockData({}, element));
       }
       this.blockList.push(block);
       if (hasDepth) {

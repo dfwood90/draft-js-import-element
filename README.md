@@ -32,6 +32,22 @@ You can optionally pass a second `Object` argument to `stateFromElement` with th
           }
         });
 
+- `filterBlockData`: Callback function to set custom block data based on block element. Example:
+        
+        stateFromElement(element, {
+          // `data` is a JS object, `element` is the HTML node for the block 
+          filterBlockData: (data, element) {
+            // Check if the element has the inline style `text-align`
+            if (element.style.textAlign) {
+              // Set `textAlign` to equal the `text-align` CSS property in the block data map
+              data.textAlign = element.style.textAlign;
+            }
+          
+            // Should always return `data`
+            return data;
+          }
+        });
+
 ## License
 
 This software is [BSD Licensed](/LICENSE).
