@@ -247,7 +247,6 @@ class BlockGenerator {
     let type = this.getBlockTypeFromTagName(tagName);
     let hasDepth = canHaveDepth(type);
     let allowRender = !SPECIAL_ELEMENTS.hasOwnProperty(tagName);
-    let data = fromJS({});
     let block: ParsedBlock = {
       tagName: tagName,
       textFragments: [],
