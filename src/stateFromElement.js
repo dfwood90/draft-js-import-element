@@ -42,6 +42,7 @@ type ParsedBlock = {
   styleStack: Array<StyleSet>;
   entityStack: Array<?Entity>;
   depth: number;
+  data: Object;
 };
 
 type ElementStyles = {[tagName: string]: Style};
@@ -178,18 +179,15 @@ class BlockGenerator {
       text = text.split(SOFT_BREAK_PLACEHOLDER).join('\n');
       // Discard empty blocks (unless otherwise specified).
       if (text.length || includeEmptyBlock) {
-        let blockData = {
-          key: genKey(),
-          text: text,
-          type: block.type,
-          characterList: characterMeta.toList(),
-          depth: block.depth,
-        };
-        if (block.hasOwnProperty('data') && Map.isMap(block.data)) {
-          blockData.data = block.data;
-        }
         contentBlocks.push(
-          new ContentBlock(blockData)
+          new ContentBlock({
+            key: genKey(),
+            text: text,
+            type: block.type,
+            characterList: characterMeta.toList(),
+            depth: block.depth,
+            data: block.hasOwnProperty('data') && Map.isMap(block.data) ? block.data : fromJS({}),
+          })
         );
       }
     });
@@ -249,6 +247,7 @@ class BlockGenerator {
     let type = this.getBlockTypeFromTagName(tagName);
     let hasDepth = canHaveDepth(type);
     let allowRender = !SPECIAL_ELEMENTS.hasOwnProperty(tagName);
+    let data = fromJS({});
     let block: ParsedBlock = {
       tagName: tagName,
       textFragments: [],
@@ -256,6 +255,7 @@ class BlockGenerator {
       styleStack: [NO_STYLE],
       entityStack: [NO_ENTITY],
       depth: hasDepth ? this.depth : 0,
+      data: {},
     };
     if (allowRender) {
       if (this.options && this.options.hasOwnProperty('filterBlockData') && this.options.filterBlockData) {
