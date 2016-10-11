@@ -23,6 +23,22 @@ const contentState = stateFromElement(element);
 
 You can optionally pass a second `Object` argument to `stateFromElement` with the following supported properties:
 
+- `blockRenderFilter`: Callback function to set block type based on HTML tag name. Example:
+
+        stateFromElement(element, {
+            // Should always return null or a valid block type. `tagName` is a lowercase version of the HTML tag name
+            blockRenderFilter: (tagName) => {
+                switch (tagName) {
+                    // This example forces all elements with the h6 tag to be assigned the block quote block type
+                    case 'h6':
+                        // You can import `BLOCK_TYPE` from Draft.js' `draft-js-utils` or use a string
+                        return BLOCK_TYPE.BLOCKQUOTE;
+                    default:
+                        return null;
+                }
+            }
+        });
+
 - `elementStyles`: HTML element name as key, DraftJS style string as value. Example:
 
         stateFromElement(element, {
