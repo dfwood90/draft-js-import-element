@@ -48,8 +48,9 @@ type ParsedBlock = {
 type ElementStyles = {[tagName: string]: Style};
 
 type Options = {
+  blockRenderFilter?: null;
   elementStyles?: ElementStyles;
-  filterBlockData?: false;
+  filterBlockData?: null;
 };
 
 const NO_STYLE = OrderedSet();
@@ -199,6 +200,15 @@ class BlockGenerator {
   }
 
   getBlockTypeFromTagName(tagName: string): string {
+    let blockType = null;
+    if (this.options.hasOwnProperty('blockRenderFilter') && this.options.blockRenderFilter) {
+      blockType = this.options.blockRenderFilter(tagName);
+    }
+
+    if (blockType) {
+      return blockType;
+    }
+
     switch (tagName) {
       case 'li': {
         let parent = this.blockStack.slice(-1)[0];
